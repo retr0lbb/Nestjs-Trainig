@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, StreamableFile } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { CoursesService } from './courses.service';
+import { CreateCourseDTO } from './dto/create-course.dto';
+import { UpdateCourseDTO } from './dto/update-course.dto';
 
 
 @Controller('courses')
@@ -10,27 +12,29 @@ export class CoursesController {
 
 
     @Get()
-    findAll(@Res() response): string{
-        return response.status(200).json({Message: "sucessful", Status: 200, Data: "Cursos"});
+    findAll(){
+        return this.courseService.findAll()
     }
-    @Get(":id/:name")
-    findOne(@Param("id") id:string, @Param("name") name:string){
-        return `Curso de ${name}: ${id}`
+
+    @Get(":id")
+    findOne(@Param("id") id: number){
+        return this.courseService.findOne(id);
     }
+    
     @Post()
-    createCourse(@Body("name") name: string, @Body("description") desc: string, @Body("tags") tags: Array<string>): string{
+    createCourse(@Body() CreateCourseDTO: CreateCourseDTO){
 
-        return "Curso criado com sucesso criado com sucesso";
+        return this.courseService.create(CreateCourseDTO);
     }
 
-    @Patch(":id")
-    update(@Param("id") id:string, @Body() body: Body, @Res() response){
-        response.status(200).json({Id: id, body: body})
+    @Put(":id")
+    update(@Param("id") id:number, @Body() UpdateCourseDTO: UpdateCourseDTO){
+        return this.courseService.update(id, UpdateCourseDTO)
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(":id")
-    remove(@Param("id") id:string): string{
-        return `Curso com o id ${id} foi removido`
+    remove(@Param("id") id:number){
+        return this.courseService.remove(id)
     }
 }
